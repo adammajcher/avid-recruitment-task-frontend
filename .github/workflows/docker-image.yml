@@ -1,0 +1,36 @@
+name: Build Docker
+
+on:
+  push:
+    # Publish `master` as Docker `latest` image.
+    branches:
+      - master
+
+env:
+  IMAGE_NAME: demo-frontend
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Tests
+        run: echo "Place for tests"
+
+  # Push image to GitHub Packages.
+  # See also https://docs.docker.com/docker-hub/builds/
+  push:
+    # Ensure test job passes before pushing image.
+    needs: test
+
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+
+      - name: Done
+        run: echo "Building image done"

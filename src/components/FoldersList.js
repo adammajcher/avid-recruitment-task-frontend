@@ -1,5 +1,7 @@
 import axios from 'axios';
 import React from 'react';
+import FolderListSearchForm from './FolderListSearchForm'
+import { Table, Form, Button } from 'react-bootstrap'
 
 class FoldersList extends React.Component {
     constructor(props) {
@@ -23,8 +25,17 @@ class FoldersList extends React.Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        console.log(this.state);
-        this.componentDidMount();
+        axios.get(`http://localhost:8080/`, {
+            params: {
+                skip: this.state.skip,
+                limit: this.state.limit,
+                query: this.state.query
+            }
+        })
+            .then(res => {
+                const folderInfos = res.data;
+                this.setState({ folderInfos: folderInfos.results })
+            });
     }
     handleChange = (event) => {
         if (event.target.value) {
@@ -39,8 +50,8 @@ class FoldersList extends React.Component {
     handleChange3 = (event) => {
         this.setState({ query: event.target.value })
     }
-    
-    handleChange4 = (event) =>{
+
+    handleChange4 = (event) => {
         this.setState({ folderToFind: event.target.value })
     }
 
@@ -70,22 +81,44 @@ class FoldersList extends React.Component {
     render() {
         return (
             <div>
-                <form onSubmit={this.handleSubmit}>
-                    Skip: < input type="number" defaultValue={this.state.skip} onChange={this.handleChange} /> (0 default)<br />
-                    Limit: < input type="number" defaultValue={this.state.limit} onChange={this.handleChange2} /> (0 brings full list) <br />
-                    Query: <input type="text" defaultValue={this.state.query} onChange={this.handleChange3} /> (eg. Demo)<br />
-                    <input type="submit" value="Send request" />
-                </form>
-
+                <FolderListSearchForm
+                    skip={this.state.skip}
+                    limit={this.state.limit}
+                    query={this.state.query}
+                    handleChange={this.handleChange}
+                    handleChange2={this.handleChange2}
+                    handleChange3={this.handleChange3}
+                    handleSubmit={this.handleSubmit} />
+                <Form>
+                    <Form.Group controlId="folderName">
+                        <Form.Label>Folder name to find</Form.Label>
+                        <Form.Control type="text" defaultValue={""} onChange={this.handleChange4} />
+                        <Form.Text className="text-muted">eg. trolololo, 11, %2F%2Ftest-path%2FCloudUX1%2Fproj1%2Fproj1%20Bin.avb</Form.Text>
+                    </Form.Group>
+                    <Button variant="primary" onClick={this.submitFolder}>
+                        Find folder
+                    </Button>
+                </Form>
                 <h1><div>Results:</div></h1>
-                {
-                    this.state.folderInfos.map(folder => <div key={folder.id} onClick={() => { this.onClickFolder(folder.id) }}>{JSON.stringify(folder)}</div>)
-                }
+                You can click on folder in table to get it's details.
+                <Table striped bordered hover>
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Path</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            this.state.folderInfos.map(folder =>
+                                <tr key={folder.id} onClick={() => { this.onClickFolder(folder.id) }}>
+                                    <td>{folder.id}</td>
+                                    <td>{folder.path}</td>
+                                </tr>)
+                        }
+                    </tbody>
+                </Table>
                 <br></br>
-                <form onSubmit={this.submitFolder}>
-                    Folder name: <input type="text" defaultValue="" onChange={this.handleChange4} />  (eg. trolololo, 11, %2F%2Ftest-path%2FCloudUX1%2Fproj1%2Fproj1%20Bin.avb) <br />
-                    <input type="submit" value="Find folder" />
-                </form>
             </div>
         )
     }

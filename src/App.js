@@ -1,4 +1,3 @@
-import './App.css';
 import { Route, Switch } from 'react-router-dom';
 import FoldersDetails from './components/FolderDetails';
 import FoldersList from './components/FoldersList';
