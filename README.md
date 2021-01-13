@@ -12,3 +12,8 @@
 * Querying backend list with filters and query paramiters.
 * Displaying folder details.
 * Searching folder by numeric id, folder name or encoded path.
+
+### Additional features:
+* Dockerfile used for creation of docker container
+* CI(Continuous integration) with free gitHub action
+* nginx configuration as static files http server
